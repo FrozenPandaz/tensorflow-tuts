@@ -1,0 +1,23 @@
+{
+  "name": "tensorflow-tuts",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/FrozenPandaz/tensorflow-tuts.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/FrozenPandaz/tensorflow-tuts/issues"
+  },
+  "homepage": "https://github.com/FrozenPandaz/tensorflow-tuts#readme",
+  "dependencies": {
+    "path": "^0.12.7",
+    "python-shell": "^0.4.0"
+  }
+}

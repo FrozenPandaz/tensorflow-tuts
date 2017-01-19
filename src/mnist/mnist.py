@@ -2,11 +2,20 @@
 from tensorflow.examples.tutorials.mnist import input_data
 mnist = input_data.read_data_sets("MNIST_data/", one_hot=True)
 
+from tensorflow.contrib.session_bundle import exporter
+
 import tensorflow as tf
 
-# Begin Model
+# Start a session
+sess = tf.InteractiveSession()
+
+# Input Data
 x = tf.placeholder(tf.float32, [None, 784])
 
+# Actual Results
+y_ = tf.placeholder(tf.float32, [None, 10])
+
+# Begin Model
 # Setup Weights
 W = tf.Variable(tf.zeros([784, 10]))
 # Wx will give a 1x10
@@ -17,9 +26,6 @@ b = tf.Variable(tf.zeros([10]))
 y = tf.nn.softmax(tf.matmul(x, W) + b)
 # End Model
 
-# Actual Results
-y_ = tf.placeholder(tf.float32, [None, 10])
-
 # Mean of the sum of y*log(y)
 cross_entropy = tf.reduce_mean(-tf.reduce_sum(y_ * tf.log(y), reduction_indices=[1]))
 
@@ -28,9 +34,6 @@ train_step = tf.train.GradientDescentOptimizer(0.5).minimize(cross_entropy)
 
 # Define initial variables
 init = tf.global_variables_initializer()
-
-# Start a session
-sess = tf.Session()
 sess.run(init)
 
 for i in range(1000):
@@ -41,3 +44,18 @@ correct_prediction = tf.equal(tf.argmax(y, 1), tf.argmax(y_, 1))
 accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
 
 print(sess.run(accuracy, feed_dict={x: mnist.test.images, y_: mnist.test.labels}))
+
+init_op = tf.group(tf.initialize_all_tables(), name='init_op')
+saver = tf.train.Saver(sharded=True)
+model_exporter = exporter.Exporter(saver)
+model_exporter.init(
+    sess.graph.as_graph_def(),
+    init_op=init_op,
+    default_graph_signature=exporter.classification_signature(
+        input_tensor=x,
+        classes_tensor=y,
+        scores_tensor=y_),
+    named_graph_signatures={
+        'inputs': exporter.generic_signature({'images': x}),
+        'outputs': exporter.generic_signature({'scores': y})})
+model_exporter.export('./export.py', tf.constant('0'), sess)
