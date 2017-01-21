@@ -3,3 +3,5 @@ MNIST_data
 node_modules
 
 export.py
+
+tmp
