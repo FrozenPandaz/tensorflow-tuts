@@ -8,7 +8,6 @@ import numpy as np
 # Enable Logging
 tf.logging.set_verbosity(tf.logging.INFO)
 
-
 # DATA
 IRIS_TRAINING = 'iris/iris_training.csv'
 IRIS_TEST = 'iris/iris_test.csv'
@@ -46,7 +45,10 @@ validation_monitor = tf.contrib.learn.monitors.ValidationMonitor(
     test_set.data,
     test_set.target,
     every_n_steps=50,
-    metrics = validation_metrics
+    metrics = validation_metrics,
+    early_stopping_metric = 'loss',
+    early_stopping_metric_minimize = True,
+    early_stopping_rounds = 200
 )
 
 # DNN Classifier
