@@ -44,18 +44,3 @@ correct_prediction = tf.equal(tf.argmax(y, 1), tf.argmax(y_, 1))
 accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
 
 print(sess.run(accuracy, feed_dict={x: mnist.test.images, y_: mnist.test.labels}))
-
-init_op = tf.group(tf.initialize_all_tables(), name='init_op')
-saver = tf.train.Saver(sharded=True)
-model_exporter = exporter.Exporter(saver)
-model_exporter.init(
-    sess.graph.as_graph_def(),
-    init_op=init_op,
-    default_graph_signature=exporter.classification_signature(
-        input_tensor=x,
-        classes_tensor=y,
-        scores_tensor=y_),
-    named_graph_signatures={
-        'inputs': exporter.generic_signature({'images': x}),
-        'outputs': exporter.generic_signature({'scores': y})})
-model_exporter.export('./export.py', tf.constant('0'), sess)
